@@ -6,7 +6,7 @@ name: Deploy Frontend
 #   APP_HOST  APP_USER  APP_PASS        accès SSH au VPS
 #   VITE_APP_SECURITY_CODE              même valeur que APP_SECURITY_CODE du backend
 # Variables optionnelles (onglet "Variables") :
-#   VITE_API_URL   URL de l'API  (défaut : https://backgestad.myresy.site/api)
+#   VITE_API_URL   surcharge de l'URL de l'API (par défaut déduite du domaine : backgestad.myresy.site)
 #   FRONT_DIR      dossier du front sur le VPS (défaut : /var/www/gestad.myresy.site/web)
 
 on:
@@ -45,7 +45,7 @@ jobs:
         env:
           VITE_APP_ENV: production
           VITE_APP_SECURITY_CODE: ${{ secrets.VITE_APP_SECURITY_CODE }}
-          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://backgestad.myresy.site/api' }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_SHOW_DEMO_ACCOUNTS: ${{ vars.VITE_SHOW_DEMO_ACCOUNTS || 'true' }}
         run: |
           pnpm install --frozen-lockfile
