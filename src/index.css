@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+@theme {
+  /* Marque GESTAD : orange vif + marine (cf. flyer) */
+  --color-primary: #ff4a0a;
+  --color-primary-hover: #e03d00;
+  --color-primary-dark: #b83300;
+  --color-primary-foreground: #ffffff;
+
+  /* Toute l'interface reprise de front-web utilise la palette "teal" comme couleur d'accent :
+     on la redéfinit en orange pour changer la couleur du template sans toucher aux composants. */
+  --color-teal-50: #fff4ed;
+  --color-teal-100: #ffe6d5;
+  --color-teal-200: #fecbaa;
+  --color-teal-300: #fdaa74;
+  --color-teal-400: #fb7a3c;
+  --color-teal-500: #ff5a14;
+  --color-teal-600: #ff4a0a;
+  --color-teal-700: #e03d00;
+  --color-teal-800: #b83300;
+  --color-teal-900: #8f2b05;
+  --color-teal-950: #4a1402;
+
+  --color-bg-light: #f4f6f8;
+  --color-bg-dark: #11151c;
+  --color-sidebar-light: #ffffff;
+  --color-sidebar-dark: #1e1e2d;
+  --color-text-main-light: #1f2937;
+  --color-text-main-dark: #cdd3de;
+  --color-text-muted-light: #6b7280;
+  --color-text-muted-dark: #7b869a;
+
+  /* Jetons des composants ui (shadcn) */
+  --color-background: var(--ui-background);
+  --color-foreground: var(--ui-foreground);
+  --color-card: var(--ui-card);
+  --color-card-foreground: var(--ui-foreground);
+  --color-popover: var(--ui-card);
+  --color-popover-foreground: var(--ui-foreground);
+  --color-secondary: var(--ui-secondary);
+  --color-secondary-foreground: var(--ui-foreground);
+  --color-muted: var(--ui-secondary);
+  --color-muted-foreground: var(--ui-muted);
+  --color-accent: var(--ui-secondary);
+  --color-accent-foreground: var(--ui-foreground);
+  --color-destructive: #dc2626;
+  --color-border: var(--ui-border);
+  --color-input: var(--ui-border);
+  --color-ring: #ff4a0a;
+}
+
+:root {
+  --bg-color: var(--color-bg-light);
+  --sidebar-color: var(--color-sidebar-light);
+  --text-main: var(--color-text-main-light);
+  --text-muted: var(--color-text-muted-light);
+  --border-color: #e7eaee;
+
+  --ui-background: #ffffff;
+  --ui-foreground: #1f2937;
+  --ui-card: #ffffff;
+  --ui-secondary: #f3f4f6;
+  --ui-muted: #6b7280;
+  --ui-border: #e5e7eb;
+}
+
+.dark {
+  --bg-color: var(--color-bg-dark);
+  --sidebar-color: var(--color-sidebar-dark);
+  --text-main: var(--color-text-main-dark);
+  --text-muted: var(--color-text-muted-dark);
+  --border-color: #2b3340;
+
+  --ui-background: #151b24;
+  --ui-foreground: #e5e9ef;
+  --ui-card: #1a212b;
+  --ui-secondary: #232c39;
+  --ui-muted: #94a0b2;
+  --ui-border: #2c3645;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ================================ CUSTOM SCROLLBAR ================================ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #ff4a0a55; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #ff4a0a; }
+
+.custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+
+/* ================================ ANIMATIONS ================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up { animation: fadeInUp 0.25s ease-out; }
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: calc(400px + 100%) 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ================================ FILTER CARD ================================ */
+.filter-card {
+  background: white;
+  border: 1px solid #ece8e5;
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 4px rgba(255, 74, 10, 0.06);
+  margin-bottom: 12px;
+}
+
+/* ================================ TABLE ACTION BUTTONS ================================ */
+.btn-action-view, .btn-action-edit, .btn-action-delete {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px; transition: all 0.15s ease;
+}
+.btn-action-view { background: #e0f2f7; color: #0284c7; border: 1px solid #bae6fd; }
+.btn-action-view:hover { background: #bae6fd; transform: scale(1.05); }
+.btn-action-edit { background: #fef9c3; color: #b45309; border: 1px solid #fde68a; }
+.btn-action-edit:hover { background: #fde68a; transform: scale(1.05); }
+.btn-action-delete { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+.btn-action-delete:hover { background: #fecaca; transform: scale(1.05); }
+
+/* ================================ TABLE ================================ */
+.overflow-x-auto table tbody tr { background-color: white; }
+html.dark .overflow-x-auto table tbody tr { background-color: #1a212b; }
+.overflow-x-auto table tbody tr:hover td:last-child { background-color: #f9fafb; }
+html.dark .overflow-x-auto table tbody tr:hover td:last-child { background-color: #202938; }
+
+/* ================================ HEADER SELECT ================================ */
+.header-select-control > div {
+  border: 1px solid #e2e8f0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  min-height: 38px !important;
+}
+.header-select-control > div:hover { border-color: #cbd5e1 !important; }
+html.dark .header-select-control > div { border-color: #334155 !important; }
+html.dark .header-select-control > div:hover { border-color: #475569 !important; }
+
+/* ================================ IMPRESSION ================================ */
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; inset: 0; background: white; color: black; padding: 24px; }
+  .no-print { display: none !important; }
+}

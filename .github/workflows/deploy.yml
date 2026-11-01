@@ -1,0 +1,76 @@
+name: Deploy Frontend
+
+# Déploiement continu : tout push sur la branche "production" construit le front et le publie sur le VPS.
+#
+# Secrets GitHub requis (Settings > Secrets and variables > Actions) :
+#   APP_HOST  APP_USER  APP_PASS        accès SSH au VPS
+#   VITE_APP_SECURITY_CODE              même valeur que APP_SECURITY_CODE du backend
+# Variables optionnelles (onglet "Variables") :
+#   VITE_API_URL   URL de l'API  (défaut : https://backgestad.myresy.site/api)
+#   FRONT_DIR      dossier du front sur le VPS (défaut : /var/www/gestad.myresy.site/web)
+
+on:
+  push:
+    branches: [ production ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      SSHPASS: ${{ secrets.APP_PASS }}
+      FRONT_DIR: ${{ vars.FRONT_DIR || '/var/www/gestad.myresy.site/web' }}
+      SSH_OPTS: -o StrictHostKeyChecking=no -o ConnectTimeout=60 -o ConnectionAttempts=5 -o ServerAliveInterval=15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies and Build
+        env:
+          VITE_APP_ENV: production
+          VITE_APP_SECURITY_CODE: ${{ secrets.VITE_APP_SECURITY_CODE }}
+          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://backgestad.myresy.site/api' }}
+          VITE_SHOW_DEMO_ACCOUNTS: ${{ vars.VITE_SHOW_DEMO_ACCOUNTS || 'true' }}
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Install SSHPASS
+        run: sudo apt update && sudo apt install sshpass -y
+
+      - name: Deploy to VPS
+        run: |
+          SUCCESS=0
+          for i in {1..3}; do
+            echo "Tentative de déploiement $i/3..."
+            if sshpass -e ssh $SSH_OPTS ${{ secrets.APP_USER }}@${{ secrets.APP_HOST }} "mkdir -p $FRONT_DIR" && \
+               sshpass -e scp $SSH_OPTS -r dist/. ${{ secrets.APP_USER }}@${{ secrets.APP_HOST }}:$FRONT_DIR/ && \
+               (sshpass -e scp $SSH_OPTS dist/.htaccess ${{ secrets.APP_USER }}@${{ secrets.APP_HOST }}:$FRONT_DIR/.htaccess || true); then
+              SUCCESS=1
+              echo "Déploiement réussi avec succès !"
+              break
+            else
+              echo "Tentative SSH $i échouée, nouvelle tentative dans 10s..."
+              sleep 10
+            fi
+          done
+          if [ $SUCCESS -ne 1 ]; then
+            echo "ERREUR : Échec du déploiement SSH après 3 tentatives !"
+            exit 1
+          fi
